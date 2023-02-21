@@ -1,0 +1,252 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<link rel="stylesheet" href="~/css/account.css" />
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<!--<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />-->
+<!--
+<div class="col-lg-8 col-md-8 col-sm-8 d-flex flex-column" style="margin:auto; max-height:100vh;">
+	<div style="padding: 3rem 0;">
+		<div style="height: 2.5rem">
+			<img src="~/images/logo.png" style="max-height:100%; object-fit:contain; height:100%;" />
+		</div>
+	</div>
+	<div id="header_command" style="font-size: 1.4rem;font-weight: bold;">
+		Enter your email to place an order or sign in.
+	</div>
+	<form method="post">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<div class="form-group">
+			<input asp-for="Email" class="form-control" style="padding: 1.2rem 1rem;border: 2px solid black;border-radius: 8px;width: 100%;font-size: 1rem;" />
+			<span asp-validation-for="Email" class="text-danger"></span>
+		</div>
+
+		<div class="form-group" style="display: none;">
+			<label asp-for="Password"></label>
+			<input asp-for="Password" class="form-control" value="123456"/>
+			<span asp-validation-for="Password" class="text-danger"></span>
+		</div>
+
+		<div class="form-group" style="display: none;">
+			<div class="custom-control custom-checkbox">
+				<input asp-for="RememberMe" type="checkbox" class="custom-control-input">
+				<label class="custom-control-label" asp-for="RememberMe">Html.DisplayNameFor(m => m.RememberMe)</label>
+			</div>
+		</div>
+		<div style="font-size: 1.2rem;font-weight: 500;padding-top:1rem;">
+			By continuing, I agree to PrintPal's <a style="text-decoration: underline;cursor:pointer;">Privacy Policy</a> and <a style="text-decoration: underline;cursor:pointer;">Terms of use</a>.
+		</div>
+		<button type="submit" class="btn-continue">Continue</button>
+	</form>
+</div>
+-->
+<!-- partial:index.partial.html -->
+<div id="container" class="main_container" style="max-width:20000px !important">
+	<!-- FORM SECTION -->
+	<div class="row">
+		<!-- SIGN UP -->
+		<div class="col align-items-center flex-col sign-up">
+			<div class="form-wrapper align-items-center">
+				<div class="form sign-up">
+					<div id="alertBox">
+					</div>
+					<!--
+					<div class="input-group">
+						<i class='bx bxs-user'></i>
+						<input type="text" id="su_username" placeholder="Username">
+					</div>-->
+					<div class="input-group">
+						<i class='bx bx-mail-send'></i>
+						<input type="email" id="su_email" placeholder="Email">
+					</div>
+					<div class="input-group">
+						<i class='bx bxs-lock-alt'></i>
+						<input type="password" id="su_pass" placeholder="Password">
+					</div>
+					<div class="input-group">
+						<i class='bx bxs-lock-alt'></i>
+						<input type="password" id="su_passconf" placeholder="Confirm password">
+					</div>
+					<button onclick="signup()">
+						Sign up
+					</button>
+					<p>
+						<span>
+							Already have an account?
+						</span>
+						<b onclick="toggle()" class="pointer" style="user-select: none; color: brown;">
+							Sign in here
+						</b>
+					</p>
+				</div>
+			</div>
+
+		</div>
+		<!-- END SIGN UP -->
+		<!-- SIGN IN -->
+		<div class="col align-items-center flex-col sign-in">
+			<div class="form-wrapper align-items-center">
+				<div class="form sign-in">
+					<div id="signin-alertbox"></div>
+					<div class="input-group">
+						<i class='bx bxs-mail-send'></i>
+						<input type="text" id="si_useremail" placeholder="Email">
+					</div>
+					<div class="input-group">
+						<i class='bx bxs-lock-alt'></i>
+						<input type="password" id="si_pass" placeholder="Password">
+					</div>
+					<button onclick="signin()">
+						Sign in
+					</button>
+					<p>
+						<b>
+							Forgot password?
+						</b>
+					</p>
+					<p>
+						<span>
+							Don't have an account?
+						</span>
+						<b onclick="toggle()" class="pointer" style="user-select: none; color: brown;">
+							Sign up here
+						</b>
+					</p>
+				</div>
+			</div>
+			<div class="form-wrapper">
+			</div>
+		</div>
+		<!-- END SIGN IN -->
+	</div>
+	<!-- END FORM SECTION -->
+	<!-- CONTENT SECTION -->
+	<div class="row content-row">
+		<!-- SIGN IN CONTENT -->
+		<div class="col align-items-center flex-col">
+			<div class="text sign-in">
+				<h2>
+					Welcome
+				</h2>
+			</div>
+			<div class="img sign-in">
+			</div>
+		</div>
+		<!-- END SIGN IN CONTENT -->
+		<!-- SIGN UP CONTENT -->
+		<div class="col align-items-center flex-col">
+			<div class="img sign-up">
+			</div>
+			<div class="text sign-up">
+				<h2>
+					Join to PrintPals
+				</h2>
+
+			</div>
+		</div>
+		<!-- END SIGN UP CONTENT -->
+	</div>
+	<!-- END CONTENT SECTION -->
+</div>
+<!-- partial -->
+
+<script>
+	$("#si_pass").on('keyup', function (e) {
+		console.log(e);
+		if (e.key === 'Enter' || e.keyCode === 13) {
+			signin();
+		}
+	});
+	function getCookie(name) {
+		var cookieValue = null;
+		if (document.cookie && document.cookie != '') {
+			var cookies = document.cookie.split(';');
+			for (var i = 0; i < cookies.length; i++) {
+				var cookie = jQuery.trim(cookies[i]);
+				// Does this cookie string begin with the name we want?
+				if (cookie.substring(0, name.length + 1) == (name + '=')) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					break;
+				}
+			}
+		}
+		return cookieValue;
+	}
+
+	$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+		if (options['type'].toLowerCase() === "post") {
+			jqXHR.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+		}
+	});
+	function signup() {
+		//		var username	= $("#su_username").val();
+		var email = $("#su_email").val();
+		var password = $("#su_pass").val();
+		var confPass = $("#su_passconf").val();
+		if (password !== confPass) {
+			alert("password not matches.");
+			return;
+		}
+		$.ajax({
+			url: "/Account/Register",
+			method: "POST",
+			data: { username: "", email, password },
+			success: function (res) {
+				if (res.status == "success") {
+					$("#alertBox").html("");
+					const container = document.getElementById("container");
+					container.classList.toggle('sign-in')
+					container.classList.toggle('sign-up')
+				}
+				else if (res.status == "error") {
+					console.log(res);
+					const errors = res.errors;
+					$("#alertBox").html("");
+					for (error of errors) {
+						console.log(error);
+						$("#alertBox").append(`<div class="alert alert-danger"><strong>${error.code}!</strong><br/>${error.description}</div>`);
+					}
+				}
+			}
+		});
+	}
+
+	function signin() {
+		var email = $("#si_useremail").val();
+		var password = $("#si_pass").val();
+		$.ajax({
+			url: "/Account/login",
+			method: "POST",
+			data: { email, password },
+			success: function (res) {
+				if (res.status == "success") {
+					$("#signin-alertbox").html("");
+					window.location.href = "/Admin";
+				}
+				else if (res.status == "error") {
+					$("#signin-alertbox").html(`<div class="alert alert-danger"><strong>Auth Error : </strong>${res.message}</div>`);
+				}
+			}
+		});
+	}
+</script>
+
+<script>
+	let container = document.getElementById('container')
+
+	toggle = () => {
+		container.classList.toggle('sign-in')
+		container.classList.toggle('sign-up')
+	}
+
+	setTimeout(() => {
+		container.classList.add('sign-in')
+	}, 200)
+</script>
+
+<script src="~/lib/bootstrap//dist//js/bootstrap.min.js"></script>

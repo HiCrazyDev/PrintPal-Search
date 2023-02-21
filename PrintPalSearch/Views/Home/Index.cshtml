@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="./lib/jquery/dist/jquery.min.js"> </script>
+
+<div class="logo">
+    <img src="img/Printpals-logo-withspace.svg" class="PrintPal_logo" />
+    <div class="Subscript_logo">We print anything, find it here.</div>
+</div>
+
+<div class="search_bg">
+    <div class="search_icon">
+        <i class="fas fa-search" style="font-size: 17px; margin-top: 2px;"></i>
+    </div>
+    <input type="text" class="search_input" value="" placeholder="Search for something to print." />
+</div>
+<div class="result_box">
+    <div class="suggestion_container">
+        <h1 class="suggestion_header">Suggestions</h1>
+        <p class="suggestion_item">No matches</p>
+    </div>
+    <div class='product_container'>
+        <div class='nothing_found'>Nothing found.</div>
+    </div>
+    <div class="cancel_box" onclick="cancelSearch()">
+        Cancel
+    </div>
+</div>
+
+<script>
+    function getIndicesOf(searchStr, str, caseSensitive) {
+        var searchStrLen = searchStr.length;
+        if (searchStrLen == 0) {
+            return [];
+        }
+        var startIndex = 0, index, indices = [];
+        if (!caseSensitive) {
+            str = str.toLowerCase();
+            searchStr = searchStr.toLowerCase();
+        }
+        while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+            indices.push(index);
+            startIndex = index + searchStrLen;
+        }
+        return indices;
+    }
+    $(document).ready(function () {
+        var timerId = null;
+        $(".search_input").keydown(function (event) {
+            if(event.which == 13){
+                var searchText = $(".search_input").val();
+                window.location.href = "/home/result/" + searchText;
+                event.preventDefault();
+            }
+        })
+        $(".search_input").keyup(function(e){
+            if(timerId !== null){ clearTimeout(timerId); timerId = null; }
+            timerId = setTimeout(() => {
+                $.ajax({
+                    url     : "/Home/SearchText",
+                    method  : "POST",
+                    data    : {text : e.target.value},
+                    success: function (res) {
+                        const products = res.products;
+                        var displayCount = Math.min(products.length, 5);
+                        if (displayCount !== 0) {
+                            $(".suggestion_container").html("<h1 class='suggestion_header'>Suggestions</h1>");
+                            $(".product_container").html("");
+                            for(var i = 0 ; i < displayCount ;  i++){
+                                var displayTitle = ``;
+                                const str = products[i].productTitle;
+                                const searchTxt = e.target.value;
+                                const regEscape = v => v.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+                                const strArr = str.split(new RegExp(regEscape(searchTxt), "ig"));
+                                var indices = getIndicesOf(searchTxt, str);
+                                displayTitle += strArr[0];
+                                for(var sI = 0 ; sI < indices.length ; sI++){
+                                    var bolded = str.slice(indices[sI], indices[sI] + searchTxt.length);
+                                    displayTitle += `<b>${bolded}</b>`;
+                                    displayTitle += strArr[sI+1];
+                                }
+
+                                $(".suggestion_container").append(`<a href="${products[i].productSrcurl}"><p class="suggestion_item"> ${displayTitle} </p></a>`);
+                                $(".product_container").append(`
+                                    <a href="${products[i].productSrcurl}">
+                                    <div class= "product_item">
+                                    <img class="image" src = "img/vinyl1.png">
+                                        <span class="subscription" > ${displayTitle}
+                                    </span>
+                                    </div>
+                                    </a>`);
+                            }
+                        }
+                        else {
+                            $(".suggestion_container").html("<h1 class='suggestion_header'>Suggestions</h1><p class='suggestion_item'>No matches</p>");
+                            $(".product_container").html("<div class='nothing_found'>Nothing found</div>");
+                        }
+                    }
+                });
+            }, 600);
+        });
+    });
+    
+    function cancelSearch(){
+        $(".search_input").val("");
+        $(".suggestion_container").html("<h1 class='suggestion_header'>Suggestions</h1><p class='suggestion_item'>No matches</p>");
+        $(".product_container").html("<div class='nothing_found'>Nothing found</div>");
+    }
+</script>
